@@ -1,0 +1,26 @@
+<mxfile host="app.diagrams.net" modified="2026-10-19T17:20:00.000Z" agent="ChatGPT" version="24.7.17" type="device">
+  <diagram id="usecase-reference-style" name="Use Case CSAT NPS">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+        <mxCell id="system" value="Hệ thống khảo sát mức độ hài lòng CSAT/NPS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#222222;strokeWidth=2;fontSize=16;fontStyle=1;verticalAlign=top;align=center;spacingTop=12;" vertex="1" parent="1"><mxGeometry x="205" y="55" width="490" height="435" as="geometry"/></mxCell>
+        <mxCell id="staff" value="Nhân viên CSKH" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;strokeColor=#222222;fillColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="65" y="190" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="manager" value="Quản lý" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;strokeColor=#222222;fillColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="65" y="360" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="customer" value="Khách hàng" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;strokeColor=#222222;fillColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="785" y="205" width="40" height="80" as="geometry"/></mxCell>
+        <mxCell id="uc1" value="UC1 - Tạo khảo sát" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1"><mxGeometry x="250" y="105" width="400" height="40" as="geometry"/></mxCell>
+        <mxCell id="uc2" value="UC2 - Gửi khảo sát" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1"><mxGeometry x="250" y="160" width="400" height="40" as="geometry"/></mxCell>
+        <mxCell id="uc3" value="UC3 - Trả lời khảo sát" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1"><mxGeometry x="250" y="215" width="400" height="40" as="geometry"/></mxCell>
+        <mxCell id="uc4" value="UC4 - Xem phản hồi" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1"><mxGeometry x="250" y="270" width="400" height="40" as="geometry"/></mxCell>
+        <mxCell id="uc5" value="UC5 - Xem tổng hợp CSAT/NPS" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1"><mxGeometry x="250" y="325" width="400" height="40" as="geometry"/></mxCell>
+        <mxCell id="uc6" value="UC6 - Đóng khảo sát" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1"><mxGeometry x="250" y="380" width="400" height="40" as="geometry"/></mxCell>
+        <mxCell id="a1" style="endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#444444;strokeWidth=1;" edge="1" parent="1" source="staff" target="uc1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a2" style="endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#444444;strokeWidth=1;" edge="1" parent="1" source="staff" target="uc2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a3" style="endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#444444;strokeWidth=1;" edge="1" parent="1" source="staff" target="uc4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a4" style="endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#444444;strokeWidth=1;" edge="1" parent="1" source="staff" target="uc6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a5" style="endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#444444;strokeWidth=1;" edge="1" parent="1" source="manager" target="uc5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a6" style="endArrow=none;startArrow=none;html=1;rounded=0;strokeColor=#444444;strokeWidth=1;" edge="1" parent="1" source="customer" target="uc3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="note" value="Đường nối thể hiện tác nhân tham gia use case; không dùng màu trang trí." style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#555555;" vertex="1" parent="1"><mxGeometry x="210" y="515" width="480" height="25" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

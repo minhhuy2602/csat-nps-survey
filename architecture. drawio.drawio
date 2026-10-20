@@ -1,0 +1,55 @@
+<mxfile host="app.diagrams.net" agent="ChatGPT">
+  <diagram id="architecture-l8-fixed" name="Architecture L8 CSAT NPS">
+    <mxGraphModel dx="1290" dy="752" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=20;fontStyle=1;fontColor=#222222;" value="KIẾN TRÚC HỆ THỐNG KHẢO SÁT CSAT/NPS — LUỒNG L8" vertex="1">
+          <mxGeometry height="40" width="870" x="150" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_staff" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#555555;fontSize=13;" value="Nhân viên CSKH / Quản lý" vertex="1">
+          <mxGeometry height="60" width="85" x="25" y="145" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_customer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#555555;fontSize=13;" value="Khách hàng&#xa;(liên kết khảo sát riêng)" vertex="1">
+          <mxGeometry height="65" width="150" x="25" y="275" as="geometry" />
+        </mxCell>
+        <mxCell id="ui" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2f8;strokeColor=#4d6b80;fontSize=13;align=left;spacingLeft=12;spacingTop=8;" value="1. PRESENTATION LAYER&#xa;Web UI / Wireframe M1, M2, M3&#xa;• Danh sách, tạo và đóng khảo sát&#xa;• Trả lời khảo sát&#xa;• Xem phản hồi và tổng hợp CSAT/NPS" vertex="1">
+          <mxGeometry height="125" width="255" x="205" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="controller" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#555555;fontSize=13;align=left;spacingLeft=12;spacingTop=8;" value="2. APPLICATION / CONTROLLER LAYER&#xa;SurveyController · ResponseController&#xa;• Nhận request và kiểm tra đầu vào&#xa;• Gọi service phù hợp&#xa;• Trả response cho giao diện" vertex="1">
+          <mxGeometry height="125" width="330" x="600" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="service" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#555555;fontSize=13;align=left;spacingLeft=12;spacingTop=8;" value="3. BUSINESS / SERVICE LAYER&#xa;SurveyService · ResponseService&#xa;AccessGuard · ScoreSummaryService&#xa;• Kiểm tra vai trò và trạng thái khảo sát&#xa;• Áp dụng quy tắc CSAT/NPS&#xa;• Xử lý phản hồi trong transaction" vertex="1">
+          <mxGeometry height="145" width="330" x="600" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="data" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2f8;strokeColor=#4d6b80;fontSize=13;align=left;spacingLeft=12;spacingTop=8;" value="4. DATA ACCESS / STORAGE LAYER&#xa;Repository / SQL queries · PostgreSQL 15+&#xa;• app_user · customer · survey&#xa;• survey_invitation · survey_response&#xa;• survey_status_log&#xa;• PK / FK / UNIQUE / CHECK / INDEX" vertex="1">
+          <mxGeometry height="145" width="330" x="600" y="505" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#aaaaaa;fontSize=11;align=left;spacingLeft=8;" value="CHÚ THÍCH&#xa;Hộp liền: thành phần trong phạm vi&#xa;Mũi tên liền xuống: gọi xử lý / truy cập dữ liệu&#xa;Mũi tên nét đứt lên: kết quả trả về&#xa;Hộp nét đứt: ngoài phạm vi BT1" vertex="1">
+          <mxGeometry height="125" width="190" x="965" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="staff_to_ui" edge="1" parent="1" source="actor_staff" style="endArrow=block;html=1;rounded=0;strokeWidth=1.3;strokeColor=#555555;fontSize=10;labelBackgroundColor=#ffffff;" target="ui" value="thao tác nội bộ">
+          <mxGeometry relative="1" x="-0.1576" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="customer_to_ui" edge="1" parent="1" source="actor_customer" style="endArrow=block;html=1;rounded=0;strokeWidth=1.3;strokeColor=#555555;fontSize=10;labelBackgroundColor=#ffffff;" target="ui" value="mở link / gửi điểm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ui_to_controller" edge="1" parent="1" source="ui" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;strokeColor=#333333;fontSize=11;labelBackgroundColor=#ffffff;" target="controller" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="controller_to_service" edge="1" parent="1" source="controller" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;strokeColor=#333333;fontSize=11;labelBackgroundColor=#ffffff;" target="service" value="">
+          <mxGeometry relative="1" y="-5" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="service_to_data" edge="1" parent="1" source="service" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;strokeColor=#333333;fontSize=11;labelBackgroundColor=#ffffff;" target="data" value="">
+          <mxGeometry relative="1" x="-0.1667" y="55" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,55 @@
+<mxfile host="Electron" agent="ChatGPT">
+  <diagram id="erd-csat-nps" name="ERD - CSAT NPS">
+    <mxGraphModel dx="932" dy="686" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=19;fontStyle=1;fontColor=#111111;" value="ERD - HỆ THỐNG KHẢO SÁT CSAT/NPS" vertex="1">
+          <mxGeometry height="35" width="540" x="280" y="15" as="geometry" />
+        </mxCell>
+        <mxCell id="app_user" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=11;align=center;verticalAlign=top;spacing=6;" value="&lt;b&gt;app_user&lt;/b&gt;&lt;hr&gt;&lt;div style=&quot;text-align:left&quot;&gt;PK id BIGINT&lt;br&gt;username VARCHAR(50) UNIQUE&lt;br&gt;password_hash VARCHAR(255)&lt;br&gt;full_name VARCHAR(100)&lt;br&gt;role VARCHAR(20)&lt;br&gt;created_at TIMESTAMPTZ&lt;/div&gt;" vertex="1">
+          <mxGeometry height="125" width="230" x="45" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="survey" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=11;align=center;verticalAlign=top;spacing=6;" value="&lt;b&gt;survey&lt;/b&gt;&lt;hr&gt;&lt;div style=&quot;text-align:left&quot;&gt;PK id BIGINT&lt;br&gt;title VARCHAR(200)&lt;br&gt;question_text VARCHAR(500)&lt;br&gt;survey_type VARCHAR(4)&lt;br&gt;status VARCHAR(10)&lt;br&gt;expires_at TIMESTAMPTZ&lt;br&gt;FK created_by BIGINT&lt;br&gt;created_at TIMESTAMPTZ&lt;/div&gt;" vertex="1">
+          <mxGeometry height="155" width="230" x="345" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="survey_status_log" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=11;align=center;verticalAlign=top;spacing=6;" value="&lt;b&gt;survey_status_log&lt;/b&gt;&lt;hr&gt;&lt;div style=&quot;text-align:left&quot;&gt;PK id BIGINT&lt;br&gt;FK survey_id BIGINT&lt;br&gt;old_status VARCHAR(10)&lt;br&gt;new_status VARCHAR(10)&lt;br&gt;FK changed_by BIGINT&lt;br&gt;changed_at TIMESTAMPTZ&lt;/div&gt;" vertex="1">
+          <mxGeometry height="135" width="230" x="700" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="customer" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=11;align=center;verticalAlign=top;spacing=6;" value="&lt;b&gt;customer&lt;/b&gt;&lt;hr&gt;&lt;div style=&quot;text-align:left&quot;&gt;PK id BIGINT&lt;br&gt;full_name VARCHAR(100)&lt;br&gt;phone VARCHAR(15) UNIQUE&lt;br&gt;email VARCHAR(100)&lt;br&gt;created_at TIMESTAMPTZ&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="230" x="45" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="survey_invitation" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=11;align=center;verticalAlign=top;spacing=6;" value="&lt;b&gt;survey_invitation&lt;/b&gt;&lt;hr&gt;&lt;div style=&quot;text-align:left&quot;&gt;PK id BIGINT&lt;br&gt;FK survey_id BIGINT&lt;br&gt;FK customer_id BIGINT&lt;br&gt;token VARCHAR(64) UNIQUE&lt;br&gt;channel VARCHAR(5)&lt;br&gt;send_status VARCHAR(10)&lt;br&gt;sent_at TIMESTAMPTZ&lt;br&gt;created_at TIMESTAMPTZ&lt;/div&gt;" vertex="1">
+          <mxGeometry height="155" width="230" x="345" y="335" as="geometry" />
+        </mxCell>
+        <mxCell id="survey_response" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=11;align=center;verticalAlign=top;spacing=6;" value="&lt;b&gt;survey_response&lt;/b&gt;&lt;hr&gt;&lt;div style=&quot;text-align:left&quot;&gt;PK id BIGINT&lt;br&gt;FK invitation_id BIGINT UNIQUE&lt;br&gt;score SMALLINT&lt;br&gt;comment VARCHAR(1000)&lt;br&gt;submitted_at TIMESTAMPTZ&lt;/div&gt;" vertex="1">
+          <mxGeometry height="120" width="230" x="700" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="r1" edge="1" parent="1" source="app_user" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;startArrow=none;strokeColor=#333333;fontSize=11;labelBackgroundColor=#ffffff;" target="survey" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r2" edge="1" parent="1" source="survey" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;startArrow=none;strokeColor=#333333;fontSize=11;labelBackgroundColor=#ffffff;" target="survey_status_log" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r3" edge="1" parent="1" source="survey" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;startArrow=none;strokeColor=#333333;fontSize=11;labelBackgroundColor=#ffffff;" target="survey_invitation" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r4" edge="1" parent="1" source="customer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;startArrow=none;strokeColor=#333333;fontSize=11;labelBackgroundColor=#ffffff;" target="survey_invitation" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r5" edge="1" parent="1" source="survey_invitation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;startArrow=none;strokeColor=#333333;fontSize=11;labelBackgroundColor=#ffffff;" target="survey_response" value="1 : 0..1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r6" edge="1" parent="1" source="app_user" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;startArrow=none;strokeColor=#333333;fontSize=11;labelBackgroundColor=#ffffff;" target="survey_status_log" value="1 : N">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="note2" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=11;fontColor=#333333;" value="Mỗi lượt gửi có tối đa một phản hồi: survey_response.invitation_id là UNIQUE." vertex="1">
+          <mxGeometry height="25" width="620" x="240" y="535" as="geometry" />
+        </mxCell>
+        <mxCell id="note3" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=11;fontColor=#333333;" value="Điểm hợp lệ theo loại khảo sát được kiểm tra tại lớp Service." vertex="1">
+          <mxGeometry height="25" width="620" x="240" y="565" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
