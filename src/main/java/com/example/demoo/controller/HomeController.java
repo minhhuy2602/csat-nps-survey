@@ -3,8 +3,8 @@ package com.example.demoo.controller;
 
 import com.example.demoo.model.Survey;
 import com.example.demoo.model.SurveyResponse;
-import com.example.demoo.repository.SurveyRepository;
-import com.example.demoo.repository.SurveyResponseRepository;
+import com.example.demoo.service.SurveyService;
+import com.example.demoo.service.SurveyResponseService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,33 +18,30 @@ import java.util.Map;
 @Controller
 public class HomeController {
 
-    private final SurveyRepository surveyRepository;
-    private final SurveyResponseRepository responseRepository;
+    private final SurveyService surveyService;
+    private final SurveyResponseService responseService;
 
     public HomeController(
-            SurveyRepository surveyRepository,
-            SurveyResponseRepository responseRepository) {
-        this.surveyRepository = surveyRepository;
-        this.responseRepository = responseRepository;
+            SurveyService surveyService,
+            SurveyResponseService responseService) {
+        this.surveyService = surveyService;
+        this.responseService = responseService;
     }
 
-    // ==================== HOME ====================
-
+    // HOME
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("surveys", surveyRepository.findAll());
+        model.addAttribute("surveys", surveyService.getAllSurveys());
         return "index";
     }
 
-    // ==================== RESULTS ====================
-
+    // RESULTS
     @GetMapping("/results")
     public String results(Model model) {
 
-        List<Survey> surveys = surveyRepository.findAll();
-
-        long totalSurveys = surveyRepository.count();
-        long totalResponses = responseRepository.count();
+        List<Survey> surveys = surveyService.getAllSurveys();
+        long totalSurveys = surveys.size();
+        long totalResponses = responseService.getAllResponses().size();
 
         Map<Long, Long> responseCounts = new HashMap<>();
         Map<Long, Double> averageScores = new HashMap<>();
@@ -54,10 +51,9 @@ public class HomeController {
         for (Survey survey : surveys) {
 
             List<SurveyResponse> responses =
-                    responseRepository.findBySurveyId(survey.getId());
+                    responseService.getResponsesBySurveyId(survey.getId());
 
             long count = responses.size();
-
             responseCounts.put(survey.getId(), count);
 
             if (count == 0) {
@@ -67,7 +63,6 @@ public class HomeController {
                 continue;
             }
 
-            // Calculate average score (kept for compatibility)
             double average = responses.stream()
                     .mapToInt(SurveyResponse::getScore)
                     .average()
@@ -75,27 +70,20 @@ public class HomeController {
 
             averageScores.put(survey.getId(), average);
 
-            // Calculate CSAT score
-            // CSAT = (Number of satisfied responses / Total responses) * 100
             if ("CSAT".equalsIgnoreCase(survey.getType())) {
-
-                long satisfiedResponses = responses.stream()
+                long satisfied = responses.stream()
                         .filter(r -> r.getScore() >= 4 && r.getScore() <= 5)
                         .count();
 
-                double csat =
-                        ((double) satisfiedResponses / count) * 100;
-
-                csatScores.put(survey.getId(), csat);
-
+                csatScores.put(
+                        survey.getId(),
+                        ((double) satisfied / count) * 100
+                );
             } else {
                 csatScores.put(survey.getId(), 0.0);
             }
 
-            // Calculate NPS score
-            // NPS = % Promoters - % Detractors
             if ("NPS".equalsIgnoreCase(survey.getType())) {
-
                 long promoters = responses.stream()
                         .filter(r -> r.getScore() >= 9)
                         .count();
@@ -104,11 +92,10 @@ public class HomeController {
                         .filter(r -> r.getScore() <= 6)
                         .count();
 
-                double nps =
-                        ((double) (promoters - detractors) / count) * 100;
-
-                npsScores.put(survey.getId(), nps);
-
+                npsScores.put(
+                        survey.getId(),
+                        ((double) (promoters - detractors) / count) * 100
+                );
             } else {
                 npsScores.put(survey.getId(), 0.0);
             }
@@ -125,8 +112,7 @@ public class HomeController {
         return "results";
     }
 
-    // ==================== CREATE SURVEY ====================
-
+    // CREATE SURVEY
     @GetMapping("/surveys/new")
     public String showCreateForm(Model model) {
         model.addAttribute("survey", new Survey());
@@ -138,39 +124,36 @@ public class HomeController {
             @ModelAttribute Survey survey,
             RedirectAttributes redirectAttributes) {
 
-        surveyRepository.save(survey);
-
-        redirectAttributes.addFlashAttribute(
-                "successMessage",
-                "Tạo khảo sát thành công!"
-        );
-
-        return "redirect:/surveys";
+        try {
+            surveyService.createSurvey(survey);
+            redirectAttributes.addFlashAttribute(
+                    "successMessage", "Tạo khảo sát thành công!"
+            );
+            return "redirect:/surveys";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage", e.getMessage()
+            );
+            return "redirect:/surveys/new";
+        }
     }
 
-    // ==================== SURVEY LIST ====================
-
+    // SURVEY LIST
     @GetMapping("/surveys")
     public String listSurveys(Model model) {
-        model.addAttribute("surveys", surveyRepository.findAll());
+        model.addAttribute("surveys", surveyService.getAllSurveys());
         return "survey-list";
     }
 
-    // ==================== SURVEY DETAIL ====================
-
+    // SURVEY DETAIL
     @GetMapping("/surveys/{id}")
     public String viewSurvey(
             @PathVariable Long id,
             Model model) {
 
-        Survey survey = surveyRepository.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Survey không tồn tại: " + id
-                        ));
-
+        Survey survey = surveyService.getSurveyById(id);
         List<SurveyResponse> responses =
-                responseRepository.findBySurveyId(id);
+                responseService.getResponsesBySurveyId(id);
 
         model.addAttribute("survey", survey);
         model.addAttribute("responses", responses);
@@ -178,21 +161,13 @@ public class HomeController {
         return "survey-detail";
     }
 
-    // ==================== EDIT SURVEY ====================
-
+    // EDIT SURVEY
     @GetMapping("/surveys/edit/{id}")
     public String showEditForm(
             @PathVariable Long id,
             Model model) {
 
-        Survey survey = surveyRepository.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Survey không tồn tại: " + id
-                        ));
-
-        model.addAttribute("survey", survey);
-
+        model.addAttribute("survey", surveyService.getSurveyById(id));
         return "survey-edit";
     }
 
@@ -202,141 +177,78 @@ public class HomeController {
             @ModelAttribute Survey survey,
             RedirectAttributes redirectAttributes) {
 
-        Survey existingSurvey = surveyRepository.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Survey không tồn tại: " + id
-                        ));
-
-        existingSurvey.setName(survey.getName());
-        existingSurvey.setType(survey.getType());
-        existingSurvey.setDescription(survey.getDescription());
-        existingSurvey.setStartDate(survey.getStartDate());
-        existingSurvey.setEndDate(survey.getEndDate());
-
-        surveyRepository.save(existingSurvey);
-
-        redirectAttributes.addFlashAttribute(
-                "successMessage",
-                "Cập nhật khảo sát thành công!"
-        );
-
-        return "redirect:/surveys";
+        try {
+            surveyService.updateSurvey(id, survey);
+            redirectAttributes.addFlashAttribute(
+                    "successMessage", "Cập nhật khảo sát thành công!"
+            );
+            return "redirect:/surveys";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage", e.getMessage()
+            );
+            return "redirect:/surveys/edit/" + id;
+        }
     }
 
-    // ==================== DELETE SURVEY ====================
-
+    // DELETE SURVEY
     @PostMapping("/surveys/delete/{id}")
     public String deleteSurvey(
             @PathVariable Long id,
             RedirectAttributes redirectAttributes) {
 
-        Survey survey = surveyRepository.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Survey không tồn tại: " + id
-                        ));
+        try {
+            // Delete responses before deleting the survey
+            responseService.deleteResponsesBySurveyId(id);
+            surveyService.deleteSurvey(id);
 
-        List<SurveyResponse> responses =
-                responseRepository.findBySurveyId(id);
-
-        responseRepository.deleteAll(responses);
-        surveyRepository.delete(survey);
-
-        redirectAttributes.addFlashAttribute(
-                "successMessage",
-                "Xóa khảo sát thành công!"
-        );
+            redirectAttributes.addFlashAttribute(
+                    "successMessage", "Xóa khảo sát thành công!"
+            );
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage", e.getMessage()
+            );
+        }
 
         return "redirect:/surveys";
     }
 
-    // ==================== CUSTOMER RESPONSE FORM ====================
-
+    // CUSTOMER RESPONSE FORM
     @GetMapping("/surveys/{id}/respond")
     public String showResponseForm(
             @PathVariable Long id,
             Model model) {
 
-        Survey survey = surveyRepository.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Survey không tồn tại: " + id
-                        ));
-
-        model.addAttribute("survey", survey);
+        model.addAttribute("survey", surveyService.getSurveyById(id));
         model.addAttribute("response", new SurveyResponse());
 
         return "response-form";
     }
 
-    // ==================== SUBMIT RESPONSE ====================
-
+    // SUBMIT RESPONSE
     @PostMapping("/surveys/{id}/respond")
     public String submitResponse(
             @PathVariable Long id,
             @ModelAttribute SurveyResponse response,
             RedirectAttributes redirectAttributes) {
 
-        Survey survey = surveyRepository.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Survey không tồn tại: " + id
-                        ));
+        try {
+            responseService.createResponse(id, response);
 
-        Integer score = response.getScore();
-
-        // Check empty score
-        if (score == null) {
             redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    "Vui lòng chọn điểm đánh giá!"
+                    "successMessage", "Gửi phản hồi thành công!"
+            );
+
+            return "redirect:/surveys/" + id;
+
+        } catch (IllegalArgumentException e) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage", e.getMessage()
             );
 
             return "redirect:/surveys/" + id + "/respond";
         }
-
-        // Validate CSAT score: 1-5
-        if ("CSAT".equalsIgnoreCase(survey.getType())) {
-
-            if (score < 1 || score > 5) {
-                redirectAttributes.addFlashAttribute(
-                        "errorMessage",
-                        "Điểm CSAT phải nằm trong khoảng từ 1 đến 5!"
-                );
-
-                return "redirect:/surveys/" + id + "/respond";
-            }
-        }
-
-        // Validate NPS score: 0-10
-        if ("NPS".equalsIgnoreCase(survey.getType())) {
-
-            if (score < 0 || score > 10) {
-                redirectAttributes.addFlashAttribute(
-                        "errorMessage",
-                        "Điểm NPS phải nằm trong khoảng từ 0 đến 10!"
-                );
-
-                return "redirect:/surveys/" + id + "/respond";
-            }
-        }
-
-        // Create a new response
-        SurveyResponse newResponse = new SurveyResponse();
-
-        newResponse.setSurvey(survey);
-        newResponse.setCustomerName(response.getCustomerName());
-        newResponse.setScore(score);
-        newResponse.setComment(response.getComment());
-
-        responseRepository.save(newResponse);
-
-        redirectAttributes.addFlashAttribute(
-                "successMessage",
-                "Gửi phản hồi thành công!"
-        );
-
-        return "redirect:/surveys/" + id;
     }
 }
