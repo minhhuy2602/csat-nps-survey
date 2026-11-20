@@ -1,0 +1,581 @@
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả khảo sát - CSAT NPS</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 40px 20px;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: #2563eb;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .card {
+            padding: 22px;
+            background: #eff6ff;
+            border-radius: 10px;
+            border: 1px solid #dbeafe;
+        }
+
+        .card h3 {
+            font-size: 16px;
+            margin: 0 0 15px;
+            color: #334155;
+        }
+
+        .number {
+            font-size: 34px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .card p {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 0;
+        }
+
+        .notice {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: #9a3412;
+        }
+
+        .section-title {
+            margin-top: 32px;
+            margin-bottom: 18px;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .chart-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            min-width: 0;
+        }
+
+        .chart-card h3 {
+            margin-top: 0;
+            color: #334155;
+            font-size: 17px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-empty {
+            text-align: center;
+            color: #64748b;
+            padding: 50px 10px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            min-width: 750px;
+        }
+
+        th, td {
+            padding: 13px;
+            border: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-csat {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge-nps {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .score {
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .detail-link {
+            display: inline-block;
+            padding: 7px 12px;
+            background: #eff6ff;
+            color: #2563eb;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .detail-link:hover {
+            background: #dbeafe;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 11px 18px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .back:hover {
+            background: #1d4ed8;
+        }
+
+        @media (max-width: 750px) {
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .summary,
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Kết quả khảo sát</h1>
+
+    <p class="subtitle">
+        Tổng quan và phân tích kết quả khảo sát CSAT và NPS trong hệ thống.
+    </p>
+
+    <!-- SUMMARY -->
+    <div class="summary">
+
+        <div class="card">
+            <h3>Tổng số khảo sát</h3>
+            <div class="number" th:text="${totalSurveys}">0</div>
+            <p>Tổng số khảo sát hiện có trong hệ thống.</p>
+        </div>
+
+        <div class="card">
+            <h3>Tổng số phản hồi</h3>
+            <div class="number" th:text="${totalResponses}">0</div>
+            <p>Tổng số câu trả lời khách hàng đã gửi.</p>
+        </div>
+
+    </div>
+
+    <!-- NOTICE -->
+    <div class="notice" th:if="${totalResponses == 0}">
+        <strong>Thông báo:</strong>
+        Hệ thống chưa có phản hồi khách hàng.
+        Vui lòng gửi phản hồi khảo sát để bắt đầu tính điểm CSAT và NPS.
+    </div>
+
+    <div class="notice" th:if="${totalResponses > 0}">
+        <strong>Thông báo:</strong>
+        Dữ liệu thống kê đã được cập nhật từ các phản hồi khách hàng.
+    </div>
+
+    <!-- CHARTS -->
+    <h2 class="section-title">Biểu đồ phân tích khảo sát</h2>
+
+    <div class="chart-grid">
+
+        <!-- CSAT CHART -->
+        <div class="chart-card">
+            <h3>Tỷ lệ hài lòng CSAT</h3>
+
+            <div class="chart-container"
+                 th:if="${#lists.size(surveys) > 0}">
+                <canvas id="csatChart"></canvas>
+            </div>
+
+            <p class="chart-empty"
+               th:if="${#lists.isEmpty(surveys)}">
+                Chưa có dữ liệu khảo sát.
+            </p>
+        </div>
+
+        <!-- NPS CHART -->
+        <div class="chart-card">
+            <h3>Chỉ số NPS</h3>
+
+            <div class="chart-container"
+                 th:if="${#lists.size(surveys) > 0}">
+                <canvas id="npsChart"></canvas>
+            </div>
+
+            <p class="chart-empty"
+               th:if="${#lists.isEmpty(surveys)}">
+                Chưa có dữ liệu khảo sát.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- DATA FOR CHARTS -->
+    <div id="chartData" style="display:none;">
+
+        <div th:each="survey : ${surveys}"
+             class="survey-data"
+             th:data-name="${survey.name}"
+             th:data-type="${survey.type}"
+             th:data-count="${responseCounts[survey.id]}"
+             th:data-csat="${csatScores[survey.id]}"
+             th:data-nps="${npsScores[survey.id]}">
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <h2 class="section-title">Thống kê theo từng khảo sát</h2>
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên khảo sát</th>
+                <th>Loại</th>
+                <th>Số phản hồi</th>
+                <th>Điểm CSAT</th>
+                <th>Chỉ số NPS</th>
+                <th>Chi tiết</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr th:each="survey : ${surveys}">
+
+                <td th:text="${survey.id}"></td>
+
+                <td th:text="${survey.name}"></td>
+
+                <td>
+                    <span th:if="${survey.type == 'CSAT'}"
+                          class="badge badge-csat">CSAT</span>
+
+                    <span th:if="${survey.type == 'NPS'}"
+                          class="badge badge-nps">NPS</span>
+
+                    <span th:if="${survey.type != 'CSAT' and survey.type != 'NPS'}"
+                          th:text="${survey.type}"></span>
+                </td>
+
+                <td th:text="${responseCounts[survey.id]}">0</td>
+
+                <!-- CSAT RESULT -->
+                <td>
+
+                    <span class="score"
+                          th:if="${survey.type == 'CSAT' and responseCounts[survey.id] > 0}"
+                          th:text="${#numbers.formatDecimal(csatScores[survey.id], 1, 2) + '%'}">
+                    </span>
+
+                    <span th:if="${survey.type == 'CSAT' and responseCounts[survey.id] == 0}">
+                        Chưa có dữ liệu
+                    </span>
+
+                    <span th:if="${survey.type == 'NPS'}">
+                        Không áp dụng
+                    </span>
+
+                </td>
+
+                <!-- NPS RESULT -->
+                <td>
+
+                    <span class="score"
+                          th:if="${survey.type == 'NPS' and responseCounts[survey.id] > 0}"
+                          th:text="${#numbers.formatDecimal(npsScores[survey.id], 1, 2) + ' điểm'}">
+                    </span>
+
+                    <span th:if="${survey.type == 'NPS' and responseCounts[survey.id] == 0}">
+                        Chưa có dữ liệu
+                    </span>
+
+                    <span th:if="${survey.type == 'CSAT'}">
+                        Không áp dụng
+                    </span>
+
+                </td>
+
+                <td>
+                    <a class="detail-link"
+                       th:href="@{/surveys/{id}(id=${survey.id})}">
+                        Xem chi tiết
+                    </a>
+                </td>
+
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(surveys)}">
+                <td colspan="7" class="empty">
+                    Chưa có khảo sát nào trong hệ thống.
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <a href="/" class="back">Quay lại trang chủ</a>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const surveyElements = document.querySelectorAll(".survey-data");
+
+        const csatLabels = [];
+        const csatValues = [];
+
+        const npsLabels = [];
+        const npsValues = [];
+
+        surveyElements.forEach(function (element) {
+
+            const name = element.dataset.name;
+            const type = element.dataset.type;
+            const count = Number(element.dataset.count);
+
+            // Ignore surveys without responses
+            if (count <= 0) {
+                return;
+            }
+
+            // Collect CSAT data
+            if (type === "CSAT") {
+                csatLabels.push(name);
+                csatValues.push(Number(element.dataset.csat));
+            }
+
+            // Collect NPS data
+            if (type === "NPS") {
+                npsLabels.push(name);
+                npsValues.push(Number(element.dataset.nps));
+            }
+        });
+
+        // ==================== CSAT CHART ====================
+
+        const csatCanvas = document.getElementById("csatChart");
+
+        if (csatCanvas) {
+
+            if (csatLabels.length > 0) {
+
+                new Chart(csatCanvas, {
+                    type: "bar",
+
+                    data: {
+                        labels: csatLabels,
+
+                        datasets: [{
+                            label: "Tỷ lệ hài lòng CSAT",
+                            data: csatValues,
+                            backgroundColor: "#3b82f6",
+                            borderRadius: 6
+                        }]
+                    },
+
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                min: 0,
+                                max: 100,
+
+                                title: {
+                                    display: true,
+                                    text: "Tỷ lệ hài lòng (%)"
+                                },
+
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + "%";
+                                    }
+                                }
+                            }
+                        },
+
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return "CSAT: " + context.parsed.y.toFixed(2) + "%";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } else {
+                csatCanvas.parentElement.innerHTML =
+                    '<p class="chart-empty">Chưa có phản hồi CSAT để thống kê.</p>';
+            }
+        }
+
+        // ==================== NPS CHART ====================
+
+        const npsCanvas = document.getElementById("npsChart");
+
+        if (npsCanvas) {
+
+            if (npsLabels.length > 0) {
+
+                new Chart(npsCanvas, {
+                    type: "bar",
+
+                    data: {
+                        labels: npsLabels,
+
+                        datasets: [{
+                            label: "Chỉ số NPS",
+                            data: npsValues,
+                            backgroundColor: "#16a34a",
+                            borderRadius: 6
+                        }]
+                    },
+
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+
+                        scales: {
+                            y: {
+                                min: -100,
+                                max: 100,
+
+                                title: {
+                                    display: true,
+                                    text: "NPS (-100 đến +100)"
+                                }
+                            }
+                        },
+
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return "NPS: " + context.parsed.y.toFixed(2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } else {
+                npsCanvas.parentElement.innerHTML =
+                    '<p class="chart-empty">Chưa có phản hồi NPS để thống kê.</p>';
+            }
+        }
+
+    });
+</script>
+
+</body>
+</html>

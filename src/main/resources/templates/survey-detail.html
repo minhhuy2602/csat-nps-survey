@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Chi tiết khảo sát - CSAT NPS</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 30px;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        h1 {
+            color: #2563eb;
+            margin-top: 0;
+        }
+
+        h2 {
+            margin-top: 30px;
+            color: #1e40af;
+        }
+
+        .info {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-top: 20px;
+        }
+
+        .info p {
+            margin: 12px 0;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button, .btn {
+            display: inline-block;
+            padding: 11px 18px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-blue {
+            background: #2563eb;
+        }
+
+        .btn-green {
+            background: #16a34a;
+        }
+
+        .btn-gray {
+            background: #64748b;
+        }
+
+        .btn-red {
+            background: #dc2626;
+        }
+
+        button:hover, .btn:hover {
+            opacity: 0.85;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .empty {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            color: #64748b;
+        }
+
+        .type {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .delete-form {
+            display: inline;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Chi tiết khảo sát</h1>
+
+    <!-- Thông báo -->
+    <div class="success"
+         th:if="${successMessage}"
+         th:text="${successMessage}">
+    </div>
+
+    <div class="error"
+         th:if="${errorMessage}"
+         th:text="${errorMessage}">
+    </div>
+
+    <!-- Thông tin khảo sát -->
+    <div class="info">
+
+        <p>
+            <strong>Mã khảo sát:</strong>
+            <span th:text="${survey.id}"></span>
+        </p>
+
+        <p>
+            <strong>Tên khảo sát:</strong>
+            <span th:text="${survey.name}"></span>
+        </p>
+
+        <p>
+            <strong>Loại khảo sát:</strong>
+            <span class="type" th:text="${survey.type}"></span>
+        </p>
+
+        <p>
+            <strong>Mô tả:</strong>
+            <span th:text="${survey.description}"></span>
+        </p>
+
+        <p>
+            <strong>Ngày bắt đầu:</strong>
+            <span th:text="${survey.startDate}"></span>
+        </p>
+
+        <p>
+            <strong>Ngày kết thúc:</strong>
+            <span th:text="${survey.endDate}"></span>
+        </p>
+
+    </div>
+
+    <!-- Các nút chức năng -->
+    <div class="actions">
+
+        <a th:href="@{/surveys/{id}/respond(id=${survey.id})}"
+           class="btn btn-green">
+            Gửi phản hồi
+        </a>
+
+        <a th:href="@{/surveys/edit/{id}(id=${survey.id})}"
+           class="btn btn-blue">
+            Chỉnh sửa khảo sát
+        </a>
+
+        <a href="/surveys"
+           class="btn btn-gray">
+            Quay lại danh sách
+        </a>
+
+        <a href="/results"
+           class="btn btn-gray">
+            Xem kết quả
+        </a>
+
+        <form class="delete-form"
+              th:action="@{/surveys/delete/{id}(id=${survey.id})}"
+              method="post"
+              onsubmit="return confirm('Bạn có chắc chắn muốn xóa khảo sát này không?')">
+
+            <button type="submit" class="btn-red">
+                Xóa khảo sát
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- Danh sách phản hồi -->
+    <h2>Danh sách phản hồi khách hàng</h2>
+
+    <div class="empty"
+         th:if="${#lists.isEmpty(responses)}">
+
+        Chưa có phản hồi nào cho khảo sát này.
+
+    </div>
+
+    <div class="table-wrapper"
+         th:unless="${#lists.isEmpty(responses)}">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Khách hàng</th>
+                    <th>Điểm đánh giá</th>
+                    <th>Nhận xét</th>
+                    <th>Thời gian gửi</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr th:each="item, stat : ${responses}">
+
+                    <td th:text="${stat.count}"></td>
+
+                    <td th:text="${item.customerName}"></td>
+
+                    <td th:text="${item.score}"></td>
+
+                    <td th:text="${item.comment != null && !item.comment.isEmpty() ? item.comment : 'Không có nhận xét'}"></td>
+
+                    <td th:text="${item.submittedAt != null ? #temporals.format(item.submittedAt, 'dd/MM/yyyy HH:mm') : 'Chưa xác định'}"></td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+</html>

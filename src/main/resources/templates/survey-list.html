@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách khảo sát</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .actions {
+            margin-bottom: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 11px 16px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .survey-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .survey-link:hover {
+            text-decoration: underline;
+        }
+
+        .empty-message {
+            padding: 20px;
+            text-align: center;
+            color: #777;
+        }
+
+        .type-csat {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .type-nps {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>DANH SÁCH KHẢO SÁT</h2>
+
+    <div class="success-message"
+         th:if="${successMessage}"
+         th:text="${successMessage}">
+    </div>
+
+    <div class="error-message"
+         th:if="${errorMessage}"
+         th:text="${errorMessage}">
+    </div>
+
+    <div class="actions">
+        <a th:href="@{/surveys/new}" class="button">
+            + Tạo khảo sát mới
+        </a>
+    </div>
+
+    <table th:if="${not #lists.isEmpty(surveys)}">
+
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên khảo sát</th>
+            <th>Loại khảo sát</th>
+            <th>Mô tả</th>
+            <th>Ngày bắt đầu</th>
+            <th>Ngày kết thúc</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="survey : ${surveys}">
+
+            <td th:text="${survey.id}"></td>
+
+            <td>
+                <a class="survey-link"
+                   th:href="@{/surveys/{id}(id=${survey.id})}"
+                   th:text="${survey.name}">
+                </a>
+            </td>
+
+            <td>
+                <span th:if="${survey.type == 'CSAT'}"
+                      class="type-csat">CSAT</span>
+
+                <span th:if="${survey.type == 'NPS'}"
+                      class="type-nps">NPS</span>
+            </td>
+
+            <td th:text="${survey.description}"></td>
+
+            <td th:text="${survey.startDate}"></td>
+
+            <td th:text="${survey.endDate}"></td>
+
+        </tr>
+        </tbody>
+
+    </table>
+
+    <div class="empty-message"
+         th:if="${#lists.isEmpty(surveys)}">
+        Chưa có khảo sát nào. Hãy tạo khảo sát đầu tiên!
+    </div>
+
+    <a th:href="@{/}" class="back-link">
+        ← Quay lại trang chủ
+    </a>
+
+</div>
+
+</body>
+</html>

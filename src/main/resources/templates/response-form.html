@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trả lời khảo sát</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 30px 15px;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: #243b53;
+            margin-bottom: 25px;
+        }
+
+        .survey-description {
+            color: #52606d;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .guide {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .csat-guide {
+            background: #eaf3ff;
+            border-left: 4px solid #2878d0;
+        }
+
+        .nps-guide {
+            background: #e9f8ef;
+            border-left: 4px solid #269b59;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #334e68;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd2d9;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2878d0;
+        }
+
+        .error-message {
+            background: #fdecec;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+        }
+
+        .success-message {
+            background: #e9f8ef;
+            color: #237a45;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button,
+        .back-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        button {
+            background: #2878d0;
+            color: white;
+        }
+
+        button:hover {
+            background: #1b5fa7;
+        }
+
+        .back-button {
+            background: #e4e7eb;
+            color: #334e68;
+        }
+
+        .back-button:hover {
+            background: #cbd2d9;
+        }
+
+        .note {
+            color: #627d98;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Trả lời khảo sát</h1>
+
+    <h3 th:text="${survey.name}">Tên khảo sát</h3>
+
+    <p class="survey-description"
+       th:text="${survey.description}">
+        Mô tả khảo sát
+    </p>
+
+    <!-- CSAT GUIDE -->
+    <div class="guide csat-guide"
+         th:if="${survey.type == 'CSAT'}">
+
+        <strong>Khảo sát CSAT - Mức độ hài lòng</strong>
+
+        <p>
+            Vui lòng đánh giá mức độ hài lòng của bạn theo thang điểm từ
+            <strong>1 đến 5</strong>.
+        </p>
+
+        <ul>
+            <li>1: Rất không hài lòng</li>
+            <li>2: Không hài lòng</li>
+            <li>3: Bình thường</li>
+            <li>4: Hài lòng</li>
+            <li>5: Rất hài lòng</li>
+        </ul>
+    </div>
+
+    <!-- NPS GUIDE -->
+    <div class="guide nps-guide"
+         th:if="${survey.type == 'NPS'}">
+
+        <strong>Khảo sát NPS - Khả năng giới thiệu</strong>
+
+        <p>
+            Bạn có sẵn sàng giới thiệu sản phẩm hoặc dịch vụ của chúng tôi
+            cho bạn bè, người thân không?
+        </p>
+
+        <p>
+            Vui lòng chọn điểm từ <strong>0 đến 10</strong>.
+        </p>
+
+        <ul>
+            <li>0 - 6: Không hài lòng (Detractors)</li>
+            <li>7 - 8: Trung lập (Passives)</li>
+            <li>9 - 10: Rất hài lòng (Promoters)</li>
+        </ul>
+    </div>
+
+    <!-- ERROR MESSAGE -->
+    <div class="error-message"
+         th:if="${errorMessage}"
+         th:text="${errorMessage}">
+    </div>
+
+    <!-- SUCCESS MESSAGE -->
+    <div class="success-message"
+         th:if="${successMessage}"
+         th:text="${successMessage}">
+    </div>
+
+    <!-- RESPONSE FORM -->
+    <form th:action="@{/surveys/{id}/respond(id=${survey.id})}"
+          th:object="${response}"
+          method="post">
+
+        <!-- CUSTOMER NAME -->
+        <div class="form-group">
+
+            <label for="customerName">
+                Họ và tên
+            </label>
+
+            <input type="text"
+                   id="customerName"
+                   th:field="*{customerName}"
+                   placeholder="Nhập họ và tên của bạn"
+                   maxlength="100"
+                   required>
+
+        </div>
+
+        <!-- SCORE -->
+        <div class="form-group">
+
+            <label for="score">
+                Điểm đánh giá
+            </label>
+
+            <input type="number"
+                   id="score"
+                   th:field="*{score}"
+                   th:attr="min=${survey.type == 'CSAT' ? 1 : 0},
+                            max=${survey.type == 'CSAT' ? 5 : 10}"
+                   th:placeholder="${survey.type == 'CSAT' ? 'Nhập điểm từ 1 đến 5' : 'Nhập điểm từ 0 đến 10'}"
+                   step="1"
+                   required>
+
+            <p class="note"
+               th:if="${survey.type == 'CSAT'}">
+                Điểm CSAT hợp lệ: từ 1 đến 5.
+            </p>
+
+            <p class="note"
+               th:if="${survey.type == 'NPS'}">
+                Điểm NPS hợp lệ: từ 0 đến 10.
+            </p>
+
+        </div>
+
+        <!-- COMMENT -->
+        <div class="form-group">
+
+            <label for="comment">
+                Nhận xét của bạn
+            </label>
+
+            <textarea id="comment"
+                      th:field="*{comment}"
+                      rows="5"
+                      maxlength="1000"
+                      placeholder="Nhập nhận xét hoặc góp ý của bạn...">
+            </textarea>
+
+            <p class="note">
+                Tối đa 1000 ký tự.
+            </p>
+
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="button-group">
+
+            <button type="submit">
+                Gửi đánh giá
+            </button>
+
+            <a th:href="@{/surveys/{id}(id=${survey.id})}"
+               class="back-button">
+                Quay lại
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>

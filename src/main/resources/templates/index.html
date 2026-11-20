@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSAT-NPS Survey</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        .card {
+            padding: 20px;
+            margin-top: 20px;
+            background: #f8fafc;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>CSAT-NPS Survey System</h1>
+    <p>Hệ thống quản lý khảo sát mức độ hài lòng khách hàng.</p>
+
+    <div class="card">
+        <h3>Quản lý khảo sát</h3>
+        <p>Tạo và quản lý các khảo sát CSAT và NPS.</p>
+
+        <a href="/surveys/new">
+            <button type="button">Tạo khảo sát</button>
+        </a>
+    </div>
+
+    <div class="card">
+        <h3>Kết quả khảo sát</h3>
+        <p>Xem và theo dõi kết quả đánh giá của khách hàng.</p>
+
+        <a href="/results">
+            <button type="button">Xem kết quả</button>
+        </a>
+    </div>
+
+</div>
+</body>
+</html>
